@@ -1,0 +1,7 @@
+services:
+  resume-website:
+    build: .
+    container_name: resume-website
+    ports:
+      - "8080:80"
+    restart: unless-stopped
