@@ -3,24 +3,28 @@ const themeToggle = document.querySelector('.theme-toggle');
 
 const savedTheme = localStorage.getItem('theme');
 
-if (savedTheme === 'light') {
-  body.classList.add('theme-light');
-  themeToggle.textContent = 'Тёмная тема';
-} else {
-  body.classList.remove('theme-light');
-  themeToggle.textContent = 'Светлая тема';
+if (themeToggle) {
+  if (savedTheme === 'light') {
+    body.classList.add('theme-light');
+    themeToggle.textContent = 'Тёмная тема';
+  } else {
+    body.classList.remove('theme-light');
+    themeToggle.textContent = 'Светлая тема';
+  }
+
+  themeToggle.addEventListener('click', () => {
+    body.classList.toggle('theme-light');
+
+    const isLight = body.classList.contains('theme-light');
+
+    localStorage.setItem('theme', isLight ? 'light' : 'dark');
+    themeToggle.textContent = isLight ? 'Тёмная тема' : 'Светлая тема';
+  });
 }
 
-themeToggle.addEventListener('click', () => {
-  body.classList.toggle('theme-light');
-
-  const isLight = body.classList.contains('theme-light');
-
-  localStorage.setItem('theme', isLight ? 'light' : 'dark');
-  themeToggle.textContent = isLight ? 'Тёмная тема' : 'Светлая тема';
-});
-
-const animatedItems = document.querySelectorAll('.section, .card, .feature, .project, .result, .step, .skill-group');
+const animatedItems = document.querySelectorAll(
+  '.section, .card, .feature, .project, .result, .step, .skill-group'
+);
 
 const observer = new IntersectionObserver(
   entries => {
@@ -74,3 +78,61 @@ if (scrollTopButton) {
     scrollTopButton.classList.toggle('is-visible', window.scrollY > 500);
   });
 }
+
+const lightbox = document.querySelector('.lightbox');
+const lightboxImage = document.querySelector('.lightbox__image');
+const lightboxClose = document.querySelector('.lightbox__close');
+const lightboxLinks = document.querySelectorAll('[data-lightbox]');
+
+function openLightbox(src, alt) {
+  if (!lightbox || !lightboxImage) {
+    return;
+  }
+
+  lightboxImage.src = src;
+  lightboxImage.alt = alt || 'Изображение проекта';
+
+  lightbox.classList.add('is-open');
+  lightbox.setAttribute('aria-hidden', 'false');
+  body.classList.add('lightbox-open');
+}
+
+function closeLightbox() {
+  if (!lightbox || !lightboxImage) {
+    return;
+  }
+
+  lightbox.classList.remove('is-open');
+  lightbox.setAttribute('aria-hidden', 'true');
+  body.classList.remove('lightbox-open');
+
+  lightboxImage.src = '';
+  lightboxImage.alt = '';
+}
+
+lightboxLinks.forEach(link => {
+  link.addEventListener('click', event => {
+    event.preventDefault();
+
+    const image = link.querySelector('img');
+    openLightbox(link.getAttribute('href'), image ? image.alt : '');
+  });
+});
+
+if (lightboxClose) {
+  lightboxClose.addEventListener('click', closeLightbox);
+}
+
+if (lightbox) {
+  lightbox.addEventListener('click', event => {
+    if (event.target === lightbox) {
+      closeLightbox();
+    }
+  });
+}
+
+document.addEventListener('keydown', event => {
+  if (event.key === 'Escape') {
+    closeLightbox();
+  }
+});
